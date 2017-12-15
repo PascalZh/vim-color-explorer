@@ -1,28 +1,3 @@
-"=============================================================================
-" Name Of File: csExplorer.vim
-"  Description: Color Scheme Explorer Vim Plugin
-"   Maintainer: Jeff Lanzarotta (delux256-vim at yahoo dot com)
-" Last Changed: Thursday, 09 June 2005
-"      Version: 7.0.1
-"        Usage: Normally, this file should reside in the plugins
-"               directory and be automatically sourced. If not, you must
-"               manually source this file using ':source csExplorer.vim'.
-"
-"               You may use the default command of
-"
-"                 ":ColorSchemeExplorer" - Opens ColorSchemeExplorer
-"
-"               For more help see supplied documentation.
-"      History: See supplied documentation.
-"=============================================================================
-
-" Define function once only
-if exists('loaded_csExplorer') || &cp
-  finish
-endif
-
-let loaded_csExplorer = 1
-
 " Create commands
 if !exists(":ColorSchemeExplorer")
   command ColorSchemeExplorer :call <SID>ColorSchemeExplorer()
@@ -31,8 +6,10 @@ endif
 " ColorSchemeExplorer {{{1
 function! <SID>ColorSchemeExplorer()
   let s:color_file_list = globpath(&runtimepath, 'colors/*.vim')
-  let s:color_file_list = substitute(s:color_file_list, '\', '/', 'g')
+  let s:airline_color_file_list = globpath(&rtp, 'autoload/airline/themes/*.vim')
+  "let s:color_file_list = substitute(s:color_file_list, '\', '/', 'g')
 
+  "setlocal autochdir
   exe "silent bot ".10."new "."Color Explorer"
 
   setlocal bufhidden=delete
@@ -40,15 +17,32 @@ function! <SID>ColorSchemeExplorer()
   setlocal modifiable
   setlocal noswapfile
   setlocal nowrap
+  setlocal foldmethod=marker
+  setlocal foldmarker={,}
+  setlocal foldtext=FoldTextFunc()
+  " 如果使用<SID>的话好像不管用
 
   map <buffer> <silent> ? :call <SID>ToggleHelp()<cr>
   map <buffer> <silent> <cr> :call <SID>SelectScheme()<cr>
   map <buffer> <silent> <2-leftmouse> :call <SID>SelectScheme(0)<cr>
   map <buffer> <silent> q :bd!<cr>
 
-  silent! put! =s:color_file_list
+  "cd ..
+  "read ++enc=utf-8 ++ff=unix freqlist
+  "normal! ggdd
+  "put! ='MostUsed{'
+  "normal! G
+  "put ='}'
+  silent put ='Colorschemes{'
+  silent put =s:color_file_list
+  silent put ='}'
+  silent put ='Airline Colorschemes{'
+  silent put =s:airline_color_file_list
+  silent put ='}'
+  normal! gg
 
   unlet! s:color_file_list
+  unlet! s:airline_color_file_list
 
   setlocal nomodifiable
 endfunction
@@ -79,6 +73,12 @@ function! <SID>Reset()
   endif
 endfunction
 
+" FoldTextFunc {{{1
+function! FoldTextFunc()
+    let line =foldtext()
+    let sub=substitute(line,'lines: ','','g')
+    return sub
+endfunction
 " ToggleHelp {{{1
 function! <SID>ToggleHelp()
   " Save position
@@ -96,5 +96,7 @@ endfunction
 
 "----------------------------------------------------------"
 "call <SID>ColorSchemeExplorer()
+"function! <SID>WriteFreqListFile(colorfile)
+"endfunction
 
 " vim:ft=vim foldmethod=marker
