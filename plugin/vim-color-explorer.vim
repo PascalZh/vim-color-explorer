@@ -10,7 +10,7 @@ function! <SID>ColorSchemeExplorer()
   "let s:color_file_list = substitute(s:color_file_list, '\', '/', 'g')
 
   "setlocal autochdir
-  exe "silent bot ".10."new "."Color Explorer"
+  exe "silent bot ".10."new "."ColorExplorer"
 
   setlocal bufhidden=delete
   setlocal buftype=nofile
@@ -22,9 +22,7 @@ function! <SID>ColorSchemeExplorer()
   setlocal foldtext=FoldTextFunc()
   " 如果使用<SID>的话好像不管用
 
-  map <buffer> <silent> ? :call <SID>ToggleHelp()<cr>
   map <buffer> <silent> <cr> :call <SID>SelectScheme()<cr>
-  map <buffer> <silent> <2-leftmouse> :call <SID>SelectScheme(0)<cr>
   map <buffer> <silent> q :bd!<cr>
 
   "cd ..
@@ -40,6 +38,7 @@ function! <SID>ColorSchemeExplorer()
   silent put =s:airline_color_file_list
   silent put ='}'
   normal! gg
+  silent put! ='Press q to quit;Press enter to choose'
 
   unlet! s:color_file_list
   unlet! s:airline_color_file_list
@@ -49,28 +48,17 @@ endfunction
 
 " SelectScheme {{{1
 function! <SID>SelectScheme()
-  " Are we on a line with a file name?
-  if strlen(getline('.')) == 0
-    return
-  endif
-
-  call <SID>Reset()
-
-  execute "source" getline('.')
-endfunction
-
-" Reset {{{1
-function! <SID>Reset()
-  hi clear Normal
-  set bg&
-
-  " Remove all existing highlighting and set the defaults.
-  hi clear
-
-  " Load the syntax highlighting defaults, if it's enabled.
-  if exists("syntax_on")
-    syntax reset
-  endif
+" Are we on a line with a file name?
+    let current_line=getline('.')
+    if strlen(current_line) == 0
+        return
+    endif
+    let theme_name=substitute(matchstr(current_line, "[a-z_0-9]\\+.vim$"),".vim","","g")
+    if matchstr(current_line, "airline")=="airline"
+        let g:airline_theme=theme_name
+    elseif
+        execute "colorscheme" theme_name
+    endif
 endfunction
 
 " FoldTextFunc {{{1
@@ -79,24 +67,3 @@ function! FoldTextFunc()
     let sub=substitute(line,'lines: ','','g')
     return sub
 endfunction
-" ToggleHelp {{{1
-function! <SID>ToggleHelp()
-  " Save position
-  normal! mZ
-
-  let header = "\" Press ? for Help\n"
-  silent! put! =header
-
-  " Jump back where we came from if possible.
-  0
-  if line("'Z") != 0
-    normal! `Z
-  endif
-endfunction
-
-"----------------------------------------------------------"
-"call <SID>ColorSchemeExplorer()
-"function! <SID>WriteFreqListFile(colorfile)
-"endfunction
-
-" vim:ft=vim foldmethod=marker
