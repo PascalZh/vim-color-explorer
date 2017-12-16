@@ -53,12 +53,16 @@ function! <SID>SelectScheme()
     if strlen(current_line) == 0
         return
     endif
-    let theme_name=substitute(matchstr(current_line, "[a-z_0-9]\\+.vim$"),".vim","","g")
+    let theme_name=substitute(matchstr(current_line, "[a-z-_0-9]\\+.vim$"),"\\\.vim","","g")
+
+    echom "THEME_NAME:" . theme_name
     if matchstr(current_line, "airline")=="airline"
-        let g:airline_theme=theme_name
-    elseif
-        execute "colorscheme" theme_name
+        echom "I've disabled this feature because of a severe bug"
+        "let g:airline_theme=theme_name
+    else
+        execute "colorscheme " . theme_name
     endif
+
 endfunction
 
 " FoldTextFunc {{{1
