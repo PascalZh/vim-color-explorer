@@ -16,6 +16,7 @@ if g:color_explorer_is_on==0
     exe "silent bot ".10."new "."ColorExplorer"
 
     setlocal bufhidden=delete
+    setlocal nobuflisted
     setlocal buftype=nofile
     setlocal modifiable
     setlocal noswapfile
