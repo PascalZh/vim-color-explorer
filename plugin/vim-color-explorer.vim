@@ -1,49 +1,59 @@
 " Create commands
-if !exists(":ColorSchemeExplorer")
-  command ColorSchemeExplorer :call <SID>ColorSchemeExplorer()
+if !exists(":ColorExplorerToggle")
+  command ColorExplorerToggle :call <SID>ColorExplorerToggle()
 endif
 
-" ColorSchemeExplorer {{{1
-function! <SID>ColorSchemeExplorer()
-  let s:color_file_list = globpath(&runtimepath, 'colors/*.vim')
-  let s:airline_color_file_list = globpath(&rtp, 'autoload/airline/themes/*.vim')
-  "let s:color_file_list = substitute(s:color_file_list, '\', '/', 'g')
+let g:color_explorer_is_on=0
+" ColorExplorerToggle {{{1
+function! <SID>ColorExplorerToggle()
 
-  "setlocal autochdir
-  exe "silent bot ".10."new "."ColorExplorer"
+if g:color_explorer_is_on==0
+    let s:color_file_list = globpath(&runtimepath, 'colors/*.vim')
+    let s:airline_color_file_list = globpath(&rtp, 'autoload/airline/themes/*.vim')
+    "let s:color_file_list = substitute(s:color_file_list, '\', '/', 'g')
 
-  setlocal bufhidden=delete
-  setlocal buftype=nofile
-  setlocal modifiable
-  setlocal noswapfile
-  setlocal nowrap
-  setlocal foldmethod=marker
-  setlocal foldmarker={,}
-  setlocal foldtext=FoldTextFunc()
-  " 如果使用<SID>的话好像不管用
+    "setlocal autochdir
+    exe "silent bot ".10."new "."ColorExplorer"
 
-  map <buffer> <silent> <cr> :call <SID>SelectScheme()<cr>
-  map <buffer> <silent> q :bd!<cr>
+    setlocal bufhidden=delete
+    setlocal buftype=nofile
+    setlocal modifiable
+    setlocal noswapfile
+    setlocal nowrap
+    setlocal foldmethod=marker
+    setlocal foldmarker={,}
+    setlocal foldtext=FoldTextFunc()
+    " 如果使用<SID>的话好像不管用
 
-  "cd ..
-  "read ++enc=utf-8 ++ff=unix freqlist
-  "normal! ggdd
-  "put! ='MostUsed{'
-  "normal! G
-  "put ='}'
-  silent put ='Colorschemes{'
-  silent put =s:color_file_list
-  silent put ='}'
-  silent put ='Airline Colorschemes{'
-  silent put =s:airline_color_file_list
-  silent put ='}'
-  normal! gg
-  silent put! ='Press q to quit;Press enter to choose'
+    map <buffer> <silent> <cr> :call <SID>SelectScheme()<cr>
+    map <buffer> <silent> q :bd<cr><C-w>p
+                \:let g:color_explorer_is_on=0<cr>
 
-  unlet! s:color_file_list
-  unlet! s:airline_color_file_list
+    "cd ..
+    "read ++enc=utf-8 ++ff=unix freqlist
+    "normal! ggdd
+    "put! ='MostUsed{'
+    "normal! G
+    "put ='}'
+    silent put ='Colorschemes{'
+    silent put =s:color_file_list
+    silent put ='}'
+    silent put ='Airline Colorschemes{'
+    silent put =s:airline_color_file_list
+    silent put ='}'
+    normal! gg
+    silent put! ='Press q to quit;Press enter to choose'
 
-  setlocal nomodifiable
+    unlet! s:color_file_list
+    unlet! s:airline_color_file_list
+
+    setlocal nomodifiable
+
+    let g:color_explorer_is_on=1
+else
+    normal q
+endif
+
 endfunction
 
 " SelectScheme {{{1
